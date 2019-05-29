@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/HealthInformationAPI.iml" filepath="$PROJECT_DIR$/.idea/HealthInformationAPI.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/iron-pidgin-api.iml" filepath="$PROJECT_DIR$/.idea/iron-pidgin-api.iml" />
     </modules>
   </component>
 </project>

@@ -1,4 +1,8 @@
 module.exports.setConfig = () => {
-    process.env.MONGOOSE_CONNECT = "mongodb://heroku_0c4cmntj:tq30pc8hvcdabf42m9aogepad0@ds133865.mlab.com:33865/heroku_0c4cmntj";
+    process.env.MONGODB = 'mongodb://rest:A8C4d8mEeXgZzkX@ds163377.mlab.com:63377/heroku_tt1xn7kl';
+    process.env.APP_DB_NAME = 'heroku_tt1xn7kl';
+    process.env.SECRET_KEY = 'mysecretkey';
     process.env.PORT = 3000;
-}
+
+    process.env.ADDRESS_PW = 'http://localhost:3005'
+};
