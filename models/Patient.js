@@ -4,8 +4,16 @@ var Schema = mongoose.Schema;
 var patientSchema = new Schema({
     firstName: String,
     lastName: String,
-    email: String,
-    emailConfirmed: Boolean
+    email: {type: String, required: true, index: { unique: true}},
+    emailConfirmed: Boolean,
+    birthdate: String, // Format: MMddYYYY
+    lastFourOfSocial: String,
+    address1: String,
+    address2: String,
+    city: String,
+    state: String,
+    zipCode: String
+
 });
 
 module.exports = mongoose.model('Patient', patientSchema);

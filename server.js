@@ -10,6 +10,7 @@ app.use(bodyparser.urlencoded({extended: true}));
 app.use(bodyparser.json());
 
 // Controllers
+var authenticateController = require('./controllers/authenticate-controller');
 var requestController = require('./controllers/request-controller');
 var patientController = require('./controllers/patient-controller');
 
@@ -30,8 +31,6 @@ app.use('/secure-api', secureRoutes);
 
 secureRoutes.use((req, res, next) => {
 
-    console.log('grabbing token');
-
     var token = req.body.token || req.headers['token'] || req.query["token"];
 
     if(token) {
@@ -39,7 +38,7 @@ secureRoutes.use((req, res, next) => {
             if(err) {
                 res.status(401).send('INVALID TOKEN');
             } else {
-                req.decoded = decoded;
+                req.user = decoded.user;
 
                 next();
             }
@@ -52,10 +51,13 @@ secureRoutes.use((req, res, next) => {
 // CREATE
 
 app.post('/patient', patientController.createPatient);
+app.post('/authenticate', authenticateController.authenticate);
 
 secureRoutes.post('/request', requestController.createRequest);
 
 // READ
+
+secureRoutes.get('/patient', patientController.getPatient);
 
 // UPDATE
 

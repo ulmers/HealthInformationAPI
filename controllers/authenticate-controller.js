@@ -1,41 +1,58 @@
+const request = require('request');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+module.exports.saltRounds = 10;
 
- module.exports.sendWithToken = (res, responseBody) => {
+ module.exports.sendWithToken = (req, res, responseBody) => {
 
-    console.log('Added token to: ' + responseBody);
-
-    var token = jwt.sign({}, process.env.SECRET_KEY, {
+    var token = jwt.sign(
+        {
+            user: req.user
+        },
+        process.env.SECRET_KEY,
+        {
         expiresIn: 4000
-    });
+        }
+    );
 
-    res.append('token', token);
+    responseBody.token = token;
 
-    res.send(responseBody);
+    res.json(responseBody);
 };
 
 module.exports.authenticate = (req, res) => {
 
+    var email = req.body.email;
 
-    var username = req.body.username.toString();
-    var password = req.body.password.toString();
-
-    console.log("login attempted for: " + username + ", " + password);
-
-
-    Instructor.findOne({username: username}, function(err, instructor) {
-        if (err){
-            return res.status(500).send("not werking");
+    const options = {
+        json: {
+            email: email
+        },
+        headers: {
+            'Content-Type': 'application/json'
         }
+    };
 
-        dbpassword = instructor.password.toString();
+    request.get(process.env.ADDRESS_PW + '/hash', options, (err, response, body) => {
+        if(err) {
+            console.log('error getting hash');
+            console.log(err.toString());
+        } else {
 
-        console.log(dbpassword);
+            bcrypt.compare(req.body.password.toString(), body.passwordHash.toString(), (err, passwordsMatch) => {
+                console.log(req.body.password.toString() + ' compared to ' + body.passwordHash.toString() + ': ' + passwordsMatch);
 
-        if(dbpassword == password){
-            sendWithToken(res, {username: username})
-        }else{
-            return res.status(500).send("bad user/pass combo");
+                if (err) {
+                    console.log('unknown error');
+                    res.status(500).send();
+                } else if (passwordsMatch === false) {
+                    console.log('passwords did not match');
+                    res.status(401).send('Username/Password combination does not exist.')
+                } else {
+                    req.user = email;
+                    this.sendWithToken(req, res, {});
+                }
+            })
         }
-    });
+    })
 };

@@ -1,6 +1,5 @@
 const request = require('request');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
 
 const authenticateController = require('../controllers/authenticate-controller');
 
@@ -8,15 +7,11 @@ var Patient = require('../models/Patient');
 
 module.exports.createPatient = (req, res) => {
 
-    console.log('create patient reached');
+    if(req.body.password === req.body.confirmPassword) {
 
-    if(req.body['password'] === req.body['confirmPassword']) {
-
-        console.log('passwords match');
+        console.log(req.body.password + ' === ' + req.body.confirmPassword);
 
         var newPatient = new Patient({
-            firstName: 'first name',
-            lastName: 'last name',
             email: req.body.email,
             emailConfirmed: false
         });
@@ -24,35 +19,54 @@ module.exports.createPatient = (req, res) => {
         newPatient.save((err, patient) => {
             if(err) {
                 console.log(err.toString());
-                res.status(500);
+                console.log(err.code);
+                res.status(400).send({});
+            } else {
+
+                bcrypt.hash(req.body.password.toString(), authenticateController.saltRounds, (err, hash) => {
+                    if(err) {
+                        console.log(err.toString())
+                    } else {
+
+                        console.log(req.body.password.toString() + ' compared to ' + hash.toString() + ': ' + bcrypt.compareSync('pass', hash));
+
+                        const options = {
+                            json: {
+                                email: patient.email,
+                                passwordHash: hash.toString()
+                            },
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        };
+
+                        request.post(process.env.ADDRESS_PW + '/hash', options, (err, response, body) => {
+                            if(err) {
+                                console.log('error posting hash');
+                                console.log(err.toString());
+                            } else {
+                                req.user = req.body.email;
+                                authenticateController.sendWithToken(req, res, {})
+                            }
+
+                        });
+                    }
+                });
             }
-
-            console.log('Added ' + patient + ': ' + patient);
-
-            bcrypt.genSalt(saltRounds, (err, salt) => {
-                bcrypt.hash(req.body.password, salt, (err, hash) => {
-
-                    const options = {
-                        json: {
-                            email: patient.email,
-                            passwordHash: hash
-                        },
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    };
-
-                    request.post(process.env.ADDRESS_PW + '/hash', options, (err, response, body) => {
-                        if(err) {
-                            console.log('error posting hash');
-                            console.log(err.toString());
-                        }
-                    })
-
-                })
-            });
-
-            authenticateController.sendWithToken(res, {})
         })
     }
+};
+
+module.exports.getPatient = (req, res) => {
+
+    Patient.findOne({email: req.user}, (err, patient) => {
+        if(err) {
+            console.log(err.toString());
+
+            console.log(err.code);
+            res.status(400).send({});
+        } else {
+            authenticateController.sendWithToken(req, res, {patient: patient})
+        }
+    })
 };
