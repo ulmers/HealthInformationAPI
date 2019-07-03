@@ -33,7 +33,7 @@ module.exports.authenticate = (req, res) => {
         }
     };
 
-    request.get(process.env.ADDRESS_PW + '/hash', options, (err, response, body) => {
+    request.get(process.env.URL_PASSWORD_DB + '/hash', options, (err, response, body) => {
         if(err) {
             console.log('error getting hash');
             console.log(err.toString());

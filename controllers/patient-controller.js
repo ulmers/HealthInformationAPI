@@ -3,7 +3,9 @@ const bcrypt = require('bcrypt');
 
 const authenticateController = require('../controllers/authenticate-controller');
 
-var Patient = require('../models/Patient');
+const MODEL_PATH = '../models/';
+
+var Patient = require(MODEL_PATH + 'Patient');
 
 module.exports.createPatient = (req, res) => {
 
@@ -40,7 +42,7 @@ module.exports.createPatient = (req, res) => {
                             }
                         };
 
-                        request.post(process.env.ADDRESS_PW + '/hash', options, (err, response, body) => {
+                        request.post(process.env.URL_PASSWORD_DB + '/hash', options, (err, response, body) => {
                             if(err) {
                                 console.log('error posting hash');
                                 console.log(err.toString());

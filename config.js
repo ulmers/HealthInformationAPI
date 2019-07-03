@@ -4,5 +4,5 @@ module.exports.setConfig = () => {
     process.env.SECRET_KEY = 'mysecretkey';
     process.env.PORT = 3000;
 
-    process.env.ADDRESS_PW = 'http://localhost:3005';
+    process.env.URL_PASSWORD_DB = 'http://localhost:3005';
 };
