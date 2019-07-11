@@ -6,14 +6,11 @@ var patientSchema = new Schema({
     lastName: String,
     email: {type: String, required: true, index: { unique: true}},
     emailConfirmed: Boolean,
-    birthdate: String, // Format: MMddYYYY
-    lastFourOfSocial: String,
     address1: String,
     address2: String,
     city: String,
     state: String,
     zipCode: String
-
 });
 
 module.exports = mongoose.model('Patient', patientSchema);
